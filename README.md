@@ -9,3 +9,11 @@ SCSC is made of 2 parts :
 
 - an ingestor
 - a CGI Python script
+
+
+1. Ingestion
+
+
+2. CGI service
+
+python -m CGIHTTPServer
