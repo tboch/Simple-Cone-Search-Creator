@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Author: Thomas Boch (github: tboch)
+# Author: Thomas Boch (github: tboch) - thomas dot boch at astro dot unistra dot fr
 
 """
-CSV ingestion for Simple Cone Search Creator project
+CSV ingestion for Simple-Cone-Search-Creator project
 
 This script takes a CSV file as input
 and creates a directory-like structure based on HEALPix tesselation,
@@ -94,7 +94,10 @@ def get_path(root, nside, ipix):
     """
     
     dir_idx = (ipix/10000)*10000;
-    return os.path.join(root, "nside%d/dir%d/npix%d.csv" % (nside, dir_idx, ipix));
+    return os.path.join(root, "nside%d/dir%d/npix%d.csv" % (nside, dir_idx, ipix))
+
+def get_cgi_config_file_name():
+    return 'cgi-config.json'
 
 def write_data_from_buffer(buffer):
     for path in buffer.keys():
@@ -166,12 +169,13 @@ if __name__ == '__main__':
     nb_valid_data_rows = 0
     nb_total_data_rows = 0
     delimiter = ','
-    print('')
+    print ''
     first_row = None
+    # TODO : find if ra and dec in sexa
     with open(csvfile) as f:
         csvreader = csv.reader(f, delimiter=delimiter)
         for row in csvreader:
-            if nb_rows_read%1 == 0:
+            if nb_rows_read%10 == 0:
                 sys.stdout.write("\033[F")
                 print 'Processing row #%d' % (nb_rows_read)
             ####### retrieve header fields names #######
@@ -288,6 +292,8 @@ if __name__ == '__main__':
             nb_total_data_rows += 1
             
     # write remaining data from buffer
+    sys.stdout.write("\033[F")
+    print 'Processing row #%d' % (nb_rows_read)
     write_data_from_buffer(buffer)
     
     # write metadata
@@ -317,12 +323,12 @@ if __name__ == '__main__':
         else:
             # try to guess datatype from first_row
             if first_row:
-                if type(first_row[k])=='str':
+                if type(first_row[k])==str:
                     field['datatype'] = 'char'
                     field['arraysize'] = '*'
-                elif type(first_row[k])=='int':
+                elif type(first_row[k])==int:
                     field['datatype'] = 'int'
-                elif type(first_row[k])=='float':
+                elif type(first_row[k])==float:
                     field['datatype'] = 'double'
              
             
@@ -330,22 +336,40 @@ if __name__ == '__main__':
     meta['fields'] = fields
     h.write(json.dumps(meta, indent = 4, sort_keys = True))
     h.close()
+    
+    # write CGI config file
+    config_path =  os.path.join(outputdir, get_cgi_config_file_name())
+    config = {'dataPath': os.path.abspath(outputdir)}
+    h = open(config_path, 'w')
+    h.write(json.dumps(config))
+    h.close()
             
-    # find if ra and dec in sexa
     
-    # à la fin: bilan du nb de données lues correctement
-    # rappel du répertoire de sortie
-    # suite des opérations
+    # TODO : suite des opérations
     
-print '\n\n%d lines parsed:' % (nb_rows_read)
-if has_header:
-    print '   - 1 header line'
-else:
-    print '   - no header line'
-print '   - %d valid data rows' % (nb_valid_data_rows)
-print '   - %d invalid data rows' % (nb_total_data_rows-nb_valid_data_rows)
-
-if not debug and nb_total_data_rows!=nb_valid_data_rows:
-    print '\nTo get more information about invalid rows, try relaunching with --debug flag'
+    print '\n%d lines parsed:' % (nb_rows_read)
+    if has_header:
+        print '   - 1 header line'
+    else:
+        print '   - no header line'
+    print '   - %d valid data rows' % (nb_valid_data_rows)
+    print '   - %d invalid data rows (ignored)' % (nb_total_data_rows-nb_valid_data_rows)
     
-print '\nData has been organized in output directory "%s"' % (outputdir)
+    if not debug and nb_total_data_rows!=nb_valid_data_rows:
+        print '   --> To get more information about invalid rows, try relaunching with --debug flag'
+        
+    print '\nData has been organized in output directory "%s"' % (outputdir)
+    
+    print '\nColumns have been described in file "%s". You might want to have a look at this file and update/correct the definitions.' % (get_metafile_path(outputdir))
+    
+    print '\nThe configuration file for the CGI has been written to "%s". Copy this file to the directory of the CGI script.' % (config_path)
+    
+    print '\n*** What now ? ***'
+    print 'You might want to:'
+    print '1. Test the Cone Search service from the command line:'
+    print '2. Test the Cone Search service'
+    print '3. Deploy the service on your production server:'
+    print '   Simply copy the newly created data directory ... on your server'
+    print '   Copy the CGI script along with ... and adjust dataPath if needed'
+    print '   Test ...'
+    
