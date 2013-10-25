@@ -125,7 +125,8 @@ def sph_dist(ra1, dec1,ra2, dec2):
     return math.degrees(2*math.asin(math.sqrt(d)))
 
 # check if config file is present
-conf_path = get_cgi_config_file_name()
+script_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
+conf_path = os.path.join(script_dir, get_cgi_config_file_name())
 data_path = None
 if not os.path.exists(conf_path):
     # perhaps data is in the same directory
