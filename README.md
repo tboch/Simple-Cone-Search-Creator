@@ -25,11 +25,15 @@ having at least right ascension and declination in decimal degrees in the ICRS c
 1.  Ingestion
 
     The ingestor takes a data file formatted in CSV, and converts it in an ad-hoc set of files, later used by the CGI script.
-    Usage: 
-        ./ingest.py --csvfile CSVFILE --outputdir OUTPUTDIR
+    Usage:
+    
+        ./ingest.py --csvfile CSVFILE --outputdir OUTPUTDIR --rafield RAFIELD --decfield DECFIELD --idfield IDFIELD
         
     (compulsory)
     (optional)
+    
+    Example:
+        ./ingest.py --csvfile ../test-data/2MASX.csv --outputdir 2MASX-cs --rafield RAJ2000 --decfield DEJ2000 --idfield 2MASX
         
     If the CSV file has no header, the script will automatically create column names (col_0, col_1, ...).
     
@@ -55,6 +59,7 @@ Generated cone search services have been tested against VO Paris (http://voparis
 Limitations
 -----------
 
-We have tested successfully our scripts to generate a Cone Search service from a 10 million rows CSV file. (PPMX data with 26 columns)
-Ingestion of the data took xxx.
-Querying a 10 degrees cone centered on LMC outputs the nnn corresponding rows in mmm seconds. 
+We have tested successfully our scripts to generate a Cone Search service from a 18 million rows CSV file. (PPMX data with 26 columns)
+Ingestion of the data took 15 minutes.
+Querying a 10 degrees radius cone centered on LMC outputs the 113,686 corresponding rows in 7 seconds.
+Queries with a radius smaller than 1 degree are usually returned in less than 1 second.
