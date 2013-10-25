@@ -29,7 +29,7 @@ having at least right ascension and declination in decimal degrees in the ICRS c
     
         ./ingest.py --csvfile CSVFILE --outputdir OUTPUTDIR --rafield RAFIELD --decfield DECFIELD [--idfield IDFIELD] [--debug]
     
-    
+    Parameters explanation:
     * CSVFILE (compulsory): path to the CSV input file
     * OUTPUTDIR (compulsory): directory that will contain the data converted to the ad-hoc format
     * RAFIELD (compulsory): name or index (zero-based) in the CSV file of the field holding the right ascension
