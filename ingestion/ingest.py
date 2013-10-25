@@ -100,6 +100,21 @@ def get_path(root, nside, ipix):
 def get_cgi_config_file_name():
     return 'cgi-config.json'
 
+def guess_type(s):
+    try:
+        int(s)
+        return int
+    except:
+        pass
+    
+    try:
+        float(s)
+        return float
+    except:
+        pass
+    
+    return str
+
 def write_data_from_buffer(buffer):
     for path in buffer.keys():
         rows = buffer[path]
@@ -331,12 +346,12 @@ if __name__ == '__main__':
         else:
             # try to guess datatype from first_row
             if first_row:
-                if type(first_row[k])==str:
+                if guess_type(first_row[k])==str:
                     field['datatype'] = 'char'
                     field['arraysize'] = '*'
-                elif type(first_row[k])==int:
+                elif guess_type(first_row[k])==int:
                     field['datatype'] = 'int'
-                elif type(first_row[k])==float:
+                elif guess_type(first_row[k])==float:
                     field['datatype'] = 'double'
              
             
