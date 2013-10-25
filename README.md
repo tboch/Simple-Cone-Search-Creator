@@ -65,7 +65,19 @@ having at least right ascension and declination in decimal degrees in the ICRS c
     * Launch from `TEMP_DIR` the command  `python -m CGIHTTPServer 1234`
     * Open the link http://0.0.0.0:1234/cgi-bin/cs.py?RA=0&DEC=0&SR=0 in your browser.
       You should see an XML file with the list of <FIELD> elements.
-    * If the previous step is working, we can go further and test the service in Aladin :
+    * If the previous step is working, we can go further and test the service in [Aladin](http://aladin.u-strasbg.fr/) :
+      + Launch Aladin
+      + Go to File-->Open
+      + Click on *Others* tab, at the bottom right of the window, and select *Generic Cone Search query*
+      + Enter `http://0.0.0.0:1234/cgi-bin/cs.py?` as the base URL, enter a target and a radius and Submit
+      + You should be able to visualize sources in the requested cone
+    * We might also try our service in [TOPCAT](http://www.star.bris.ac.uk/~mbt/topcat/):
+      + Launch TOPCAT
+      + Go to File-->Load Table
+      + Go to Data Sources-->Cone Search
+      + Enter `http://0.0.0.0:1234/cgi-bin/cs.py?` as the Cone URL (bottom panel of the window)
+      + Enter a position and a radius and click on OK
+      + A new table with corresponding sources should appear in TOPCAT
         
 
 
