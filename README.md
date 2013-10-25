@@ -29,10 +29,13 @@ having at least right ascension and declination in decimal degrees in the ICRS c
     
         ./ingest.py --csvfile CSVFILE --outputdir OUTPUTDIR --rafield RAFIELD --decfield DECFIELD --idfield IDFIELD
         
+    csvfile
+     : path to the CSV input file
     (compulsory)
     (optional)
     
     Example:
+    
         ./ingest.py --csvfile ../test-data/2MASX.csv --outputdir 2MASX-cs --rafield RAJ2000 --decfield DEJ2000 --idfield 2MASX
         
     If the CSV file has no header, the script will automatically create column names (col_0, col_1, ...).

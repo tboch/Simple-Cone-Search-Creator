@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Author: Thomas Boch (github: tboch) - thomas dot boch at astro dot unistra dot fr
+# Affiliation: Observatoire astronomique de Strasbourg
 
 """
 CSV ingestion for Simple-Cone-Search-Creator project
@@ -31,7 +32,7 @@ import healpy
 import datetime
 import json
 
-MAX_ROWS_IN_BUFFER = 20000 # max rows before writing to disk
+MAX_ROWS_IN_BUFFER = 50000 # max rows before writing to disk
 
 def get_csv_sample(csv_path, sample_size=100):
     sample = ''
@@ -76,7 +77,7 @@ def nside_for_nbsrc(nbsrc):
         return 256
     elif nbsrc>1e7:
         return 128
-    elif nbsrc>1e5:
+    elif nbsrc>1e6:
         return 64
     else:
         return 32
@@ -107,7 +108,6 @@ def write_data_from_buffer(buffer):
             for row in rows:
                 csvwriter.writerow(row)
                     
-    buffer = {}
 
 
 def trace(msg):
@@ -123,6 +123,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--decfield", help="Name (or index) of the field holding declination")
     parser.add_argument("-i", "--idfield", help="Name (or index) of the field holding the ID of the current record")
     parser.add_argument("-o", "--outputdir", help="Output directory path")
+    parser.add_argument("--nside", help="Force nside used")
     parser.add_argument("--debug", help="Enables debugging information", action="store_true")
     
     
@@ -159,8 +160,12 @@ if __name__ == '__main__':
     nb_rows_estimation = estimate_nb_rows(csvfile)
     trace('Nb rows estimated: %d' % (nb_rows_estimation))
     
-    nside = nside_for_nbsrc(nb_rows_estimation)
-    trace('Chosen NSIDE: %d' % (nside))
+    if args.nside:
+        nside = int(args.nside)
+        trace('NSIDE chosen by user: %s' % (nside))
+    else:
+        nside = nside_for_nbsrc(nb_rows_estimation)
+        trace('Chosen NSIDE: %d' % (nside))
     
     buffer = {} # opened files
     nb_rows_in_buffer = 0
@@ -236,22 +241,24 @@ if __name__ == '__main__':
             if nb_rows_read==1:
                 first_row = row
             
-            # TODO: consider sexa coordinates
+            # TODO: take into account sexa coordinates
             is_valid = True
-            try:  
-                ra = float(row[raIdx])
-            except:
-                is_valid= False
-                trace('Could not parse "%s" as right ascension' % (row[raIdx]))
-            try:
-                dec = float(row[decIdx])
-            except:
-                is_valid = False
-                trace('Could not parse "%s" as declination' % (row[decIdx]))
-                
+            
             if len(row)!=len_header_fields:
                 is_valid = False
                 trace('Row has a different number of fields than header: %d versus %d' % (len(row), len_header_fields)) 
+            else:
+                
+                try:  
+                    ra = float(row[raIdx])
+                except:
+                    is_valid= False
+                    trace('Could not parse "%s" as right ascension' % (row[raIdx]))
+                try:
+                    dec = float(row[decIdx])
+                except:
+                    is_valid = False
+                    trace('Could not parse "%s" as declination' % (row[decIdx]))
                 
                 
             if not is_valid:
@@ -283,6 +290,7 @@ if __name__ == '__main__':
             if nb_rows_in_buffer>MAX_ROWS_IN_BUFFER:
                 write_data_from_buffer(buffer)
                 nb_rows_in_buffer = 0
+                buffer = {}
                 
                 
             

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Author: Thomas Boch (github: tboch) - thomas dot boch at astro dot unistra dot fr
+# Affiliation: Observatoire astronomique de Strasbourg
+
 
 """
 CGI script for Simple-Cone-Search-Creator project
@@ -140,7 +142,7 @@ else:
     
 metadata_path = get_metafile_path(data_path)
 if not os.path.exists(metadata_path):
-    output_error('Service error: could not find metadata file %s' % (metadata))
+    output_error('Service error: could not find metadata file %s' % (metadata_path))
     
 with open(metadata_path) as h:
     metadata = json.loads(h.read())
@@ -164,15 +166,15 @@ sr_str  = params.getfirst('SR')
 try:
     ra = float(ra_str)
 except:
-    output_error('Could not parse value "%s" of RA parameter as a float' % (ra_str))
+    output_error("Could not parse value '%s' of RA parameter as a float" % (ra_str))
 try:
     dec = float(dec_str)
 except:
-    output_error('Could not parse value "%s" of DEC parameter as a float' % (dec_str))
+    output_error("Could not parse value '%s' of DEC parameter as a float" % (dec_str))
 try:
     sr = float(sr_str)
 except:
-    output_error('Could not parse value "%s" of SR parameter as a float' % (sr_str))
+    output_error("Could not parse value '%s' of SR parameter as a float" % (sr_str))
 
 # Check if parameters are withing sensible range
 if ra<0 or ra>=360:
