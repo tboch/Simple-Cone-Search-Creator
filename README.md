@@ -36,7 +36,7 @@ having at least right ascension and declination in decimal degrees in the ICRS c
     * DECFIELD (compulsory): name or index (zero-based) in the CSV file of the field holding the declination
     * IDFIELD (optional): name or index (zero-based) in the CSV file of the field holding the identifier string. If not given, the script will generate an identifier based on the row index.
     
-    Example (using HIP.csv file available in [test-data directory](tree/master/test-data)):
+    Example (using HIP.csv file available in [test-data directory](https://github.com/tboch/Simple-Cone-Search-Creator/tree/master/test-data)):
     
         ./ingest.py --csvfile ../test-data/HIP.csv --outputdir HIP-cs --rafield _RAJ2000 --decfield _DEJ2000 --idfield HIP
         
