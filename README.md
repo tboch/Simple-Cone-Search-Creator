@@ -94,6 +94,16 @@ Ingestion of the data took 15 minutes.
 Querying a 10 degrees radius cone centered on LMC outputs the 113,686 corresponding rows in 7 seconds.
 Queries with a radius smaller than 1 degree are usually returned in less than 1 second.
 
+License
+-------
+
+The source code is available under the [BSD 3-clause license](/tboch/Simple-Cone-Search-Creator/blob/master/LICENSE).
+
+Test data origin
+----------------
+
+The test data HIP.csv has been extracted from the Hipparcos catalogue (_1997ESASP1200.....P_) [available in VizieR](http://vizier.u-strasbg.fr/viz-bin/VizieR-3?-source=I/239/hip_main). 
+
 Feedback
 --------
 
