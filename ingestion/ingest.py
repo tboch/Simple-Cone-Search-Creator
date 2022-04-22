@@ -95,7 +95,7 @@ def get_path(root, nside, ipix):
     """
     
     dir_idx = (ipix/10000)*10000;
-    return os.path.join(root, "nside%d/dir%d/npix%d.csv" % (nside, dir_idx, ipix))
+    return os.path.join(root, """nside{}/dir{}/npix{}.csv""".format(nside, dir_idx, ipix))
 
 def get_cgi_config_file_name():
     return 'cgi-config.json'
@@ -142,10 +142,12 @@ if __name__ == '__main__':
     parser.add_argument("--debug", help="Enables debugging information", action="store_true")
     
     
-    usage = '%s --csvfile <CSV-FILE> --rafield <RA-FIELD> --decfield <DEC-FIELD> --outputdir <OUTPUT-DIR> ' % (sys.argv[0])
+    usage = """{} --csvfile <CSV-FILE> --rafield <RA-FIELD> \
+--decfield <DEC-FIELD> --outputdir <OUTPUT-DIR> \
+                  """.format(sys.argv[0])
     args = parser.parse_args()
     if not args.csvfile or not args.outputdir or not args.rafield or not args.decfield:
-        print('Usage:\n%s' % (usage))
+        print("""Usage:\n{}""".format(usage))
         sys.exit(1)
 
     csvfile = args.csvfile
@@ -161,23 +163,24 @@ if __name__ == '__main__':
     
     # check params (does file exist, does output dir exist and is empty)
     if not os.path.exists(outputdir):
-        print 'Output directory "%s" does not exist ! ' % (outputdir)
+        print ('Output directory {} does not exist!'.format(
+        outputdir))
         sys.exit(1)
         
     if len(os.listdir(outputdir))>0:
-        print 'Output directory "%s" is not empty' % (outputdir)
+        print ('Output directory "{}" is not empty'.format(outputdir))
         sys.exit(1)
         
     
     has_header = csv_has_header(csvfile)
-    trace('Has header: %s' % (has_header))
+    trace('Has header: {}'.format(has_header))
     
     nb_rows_estimation = estimate_nb_rows(csvfile)
-    trace('Nb rows estimated: %d' % (nb_rows_estimation))
+    trace('Nb rows estimated: {}'.format(nb_rows_estimation))
     
     if args.nside:
         nside = int(args.nside)
-        trace('NSIDE chosen by user: %s' % (nside))
+        trace('NSIDE chosen by user: {}'.format(nside))
     else:
         nside = nside_for_nbsrc(nb_rows_estimation)
         trace('Chosen NSIDE: %d' % (nside))
@@ -189,7 +192,7 @@ if __name__ == '__main__':
     nb_valid_data_rows = 0
     nb_total_data_rows = 0
     delimiter = ','
-    print ''
+    print ("")
     first_row = None
     # TODO : find if ra and dec in sexa
     with open(csvfile) as f:
@@ -197,7 +200,7 @@ if __name__ == '__main__':
         for row in csvreader:
             if nb_rows_read%10 == 0:
                 sys.stdout.write("\033[F")
-                print 'Processing row #%d' % (nb_rows_read)
+                print ('Processing row #{}'.format(nb_rows_read))
             ####### retrieve header fields names #######
             if nb_rows_read==0:
                 if has_header:
@@ -225,9 +228,9 @@ if __name__ == '__main__':
                         pass
                     
                 if raIdx<0:
-                    print 'Could not find ra field "%s"' % (ra)
+                    print ('Could not find ra field "{}"'.format(ra))
                 if decIdx<0:
-                    print 'Could not find dec field "%s"' % (dec)
+                    print ('Could not find dec field "{}"'.format(dec))
 
                 if raIdx<0 or decIdx<0:
                     sys.exit(1)
@@ -244,7 +247,7 @@ if __name__ == '__main__':
                             pass
                         
                     if idIdx<0:
-                        print 'Could not find id field "%s"' % (id)
+                        print ('Could not find id field "{}"'.format(id))
                         sys.exit(1)
                 else:
                     id_field_missing = True
@@ -261,23 +264,27 @@ if __name__ == '__main__':
             
             if len(row)!=len_header_fields:
                 is_valid = False
-                trace('Row has a different number of fields than header: %d versus %d' % (len(row), len_header_fields)) 
+                trace(
+                'Row has a different number of fields than header: {}versus {}'.format(
+                  len(row), len_header_fields)) 
             else:
                 
                 try:  
                     ra = float(row[raIdx])
                 except:
                     is_valid= False
-                    trace('Could not parse "%s" as right ascension' % (row[raIdx]))
+                    trace('Could not parse "{}" as right ascension'.format(
+                      row[raIdx]))
                 try:
                     dec = float(row[decIdx])
                 except:
                     is_valid = False
-                    trace('Could not parse "%s" as declination' % (row[decIdx]))
+                    trace('Could not parse "{}" as declination'.format(
+                       row[decIdx]))
                 
                 
             if not is_valid:
-                trace('Invalid line: %s\n' % (delimiter.join(row)))
+                trace('Invalid line: {}\n'.format(delimiter.join(row)))
                 nb_total_data_rows += 1
                 nb_rows_read += 1
                 continue
@@ -297,7 +304,7 @@ if __name__ == '__main__':
             
             # generate an ID
             if id_field_missing:
-                row.append('id_%d' % (nb_total_data_rows))
+                row.append('id_{}'.format(nb_total_data_rows))
                 
             rows.append(row)
             nb_rows_in_buffer += 1
@@ -316,7 +323,7 @@ if __name__ == '__main__':
             
     # write remaining data from buffer
     sys.stdout.write("\033[F")
-    print 'Processing row #%d' % (nb_rows_read)
+    print ('Processing row #{}'.format(nb_rows_read))
     write_data_from_buffer(buffer)
     
     # write metadata
@@ -370,29 +377,41 @@ if __name__ == '__main__':
     
     # TODO : suite des opérations
     
-    print '\n%d lines parsed:' % (nb_rows_read)
     if has_header:
-        print '   - 1 header line'
+        header_line="1"
     else:
-        print '   - no header line'
-    print '   - %d valid data rows' % (nb_valid_data_rows)
-    print '   - %d invalid data rows (ignored)' % (nb_total_data_rows-nb_valid_data_rows)
-    
+        header_line="no"
+
+    relaunchflag=""
     if not debug and nb_total_data_rows!=nb_valid_data_rows:
-        print '   --> To get more information about invalid rows, try relaunching with --debug flag'
+        relaunchflag="   --> To get more information about invalid rows, try relaunching with --debug flag"
+
+    print("""
+    {nb_rows_read} lines parsed:
+    - {header_line} header line
+    {nb_valid_data_rows} valid data rows
+    {nb_invalid_data_rows} invalid data rows (ignored)
+    {relaunchflag}
         
-    print '\nData has been organized in output directory "%s"' % (outputdir)
+    Data has been organized in output directory "{outputdir}"
     
-    print '\nColumns have been described in file "%s". You might want to have a look at this file and update/correct the definitions.' % (get_metafile_path(outputdir))
+    Columns have been described in file "{metafile}". You might want to have a look at this file and update/correct the definitions.
+    The configuration file for the CGI has been written to {config_path}. Copy this file to the directory of the CGI script.
     
-    print '\nThe configuration file for the CGI has been written to "%s". Copy this file to the directory of the CGI script.' % (config_path)
-    
-    print '\n*** What now ? ***'
-    print 'You might want to:'
-    print '1. Test the Cone Search service from the command line:'
-    print '2. Test the Cone Search service'
-    print '3. Deploy the service on your production server:'
-    print '   Simply copy the newly created data directory ... on your server'
-    print '   Copy the CGI script along with ... and adjust dataPath if needed'
-    print '   Test ...'
-    
+    *** What now ? ***
+    You might want to:
+    1. Test the Cone Search service from the command line:
+    2. Test the Cone Search service
+    3. Deploy the service on your production server:
+       Simply copy the newly created data directory ... on your server
+       Copy the CGI script along with ... and adjust dataPath if needed
+       Test ...""".format(
+        nb_rows_read=nb_rows_read,
+        header_line=header_line,
+        nb_valid_data_rows=nb_valid_data_rows, 
+        nb_invalid_data_rows=nb_total_data_rows-nb_valid_data_rows,
+        relaunchflag=relaunchflag,
+        outputdir=outputdir,
+        metafile=get_metafile_path(outputdir),
+        config_path=config_path ))
+
