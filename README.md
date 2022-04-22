@@ -58,7 +58,7 @@ having at least right ascension and declination in decimal degrees in the ICRS c
     * `cd TEMP_DIR`
     * `mkdir cgi-bin`
     * Copy `cs.py` and `OUTPUTDIR/cgi-config.json` to `TEMP_DIR/cgi-bin`
-    * Launch from `TEMP_DIR` the command  `python -m CGIHTTPServer 1234`
+    * Launch from `TEMP_DIR` the command `python3 -m http.server 1234 --cgi` 
     * Open the link http://0.0.0.0:1234/cgi-bin/cs.py?RA=0&DEC=0&SR=0 in your browser.
       You should see an XML file with the list of <FIELD> elements.
     * If the previous step is working, we can go further and test the service in [Aladin](http://aladin.u-strasbg.fr/) :
